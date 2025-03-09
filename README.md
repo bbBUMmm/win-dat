@@ -27,5 +27,12 @@ In the coming months, WinDat will integrate additional games and expand its feat
 ## Contributing
 If you're interested in contributing to the project, feel free to fork the repository, submit pull requests, or open issues for any suggestions or bugs.
 
+## Collection of requirements
+- **RQ01** The system will allow to create user account
+- **RQ02** The sustem will be able to add credits to the user account
+- **RQ02** The system will allow to create the lobby
+- **RQ03** The system will allow to connect to the lobby exaclty two users
+- **RQ04** 
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
