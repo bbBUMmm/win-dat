@@ -37,7 +37,23 @@ If you're interested in contributing to the project, feel free to fork the repos
 - **RQ07** The system will be able to transfer credits from the player who lost the game to the winner  
 - **RQ08** The admin user will be able to add credits to player accounts  
 - **RQ09** The user will be able to find the game lobby with an invitation code  
-- **RQ10** The system will not allow users to connect to the game lobby if it is full (2 players max.)  
+- **RQ10** The system will not allow users to connect to the game lobby if it is full (2 players max.)
+
+## Glossary of Terms
+
+| Term | Definition |
+|------|-----------|
+| **User Account** | A personal profile that allows a player to access the system and participate in games. |
+| **Admin** | A privileged user who has control over game settings, including adding credits to player accounts. |
+| **Credits** | A virtual currency used within the system, which can be added, transferred, or won. |
+| **Lobby** | A waiting area where players gather before starting a game. A lobby can have a maximum of 2 players. |
+| **Invitation Code** | A unique code used to join a specific game lobby. |
+| **Leaderboard** | A ranking table displaying all current users based on their credits ballance. |
+| **Winner** | The player who successfully wins a game session. |
+| **Loser** | A player who does not win the game and may lose credits to the winner. |
+| **Game Session** | An instance of a game played within a lobby, resulting in a winner and a loser. |
+| **Account Balance** | The total amount of credits available in a user's account. |
+
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
