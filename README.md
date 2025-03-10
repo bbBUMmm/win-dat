@@ -28,11 +28,16 @@ In the coming months, WinDat will integrate additional games and expand its feat
 If you're interested in contributing to the project, feel free to fork the repository, submit pull requests, or open issues for any suggestions or bugs.
 
 ## Collection of requirements
-- **RQ01** The system will allow to create user account
-- **RQ02** The sustem will be able to add credits to the user account
-- **RQ02** The system will allow to create the lobby
-- **RQ03** The system will allow to connect to the lobby exaclty two users
-- **RQ04** 
+- **RQ01** The system will allow users to create an account  
+- **RQ02** The system will be able to add credits to the user account  
+- **RQ03** The system will allow users to create a lobby  
+- **RQ04** The system will allow users to connect to the lobby  
+- **RQ05** The system will show a leaderboard table with all current users  
+- **RQ06** The system will be able to choose a winner of the lobby  
+- **RQ07** The system will be able to transfer credits from the player who lost the game to the winner  
+- **RQ08** The admin user will be able to add credits to player accounts  
+- **RQ09** The user will be able to find the game lobby with an invitation code  
+- **RQ10** The system will not allow users to connect to the game lobby if it is full (2 players max.)  
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
