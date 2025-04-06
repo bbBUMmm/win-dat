@@ -15,7 +15,6 @@ public class Lobby {
      * Required for JPA entity instantiation.
      */
     public Lobby(){
-
     }
 
     /**

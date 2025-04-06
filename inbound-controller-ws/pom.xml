@@ -73,10 +73,6 @@
                         <configuration>
                             <rules>
                                 <bannedDependencies>
-                                    <excludes>
-                                        <!-- Activate whitelisting of allowed submodules -->
-                                        <exclude>org.windat.jpa:*</exclude>
-                                    </excludes>
                                     <includes>
                                         <!-- Domain is obviously required -->
                                         <include>org.windat:domain</include>

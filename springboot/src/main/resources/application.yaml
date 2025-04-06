@@ -15,13 +15,13 @@ spring:
     mapping-resources:
       - persistence/orm.xml
 # Kubernetes probes (readiness & liveness) and monitoring
-#management:
-#  endpoint:
-#    health:
-#      probes:
-#        enabled: true
-#      show-details: always
-#  endpoints:
-#    web:
-#      exposure:
-#        incl  ude: "*"
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
