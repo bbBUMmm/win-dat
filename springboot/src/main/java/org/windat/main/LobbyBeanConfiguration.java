@@ -18,6 +18,7 @@ import org.windat.jpa.repository.LobbySpringDataRepository;
 @Component
 public class LobbyBeanConfiguration {
 
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -26,6 +27,10 @@ public class LobbyBeanConfiguration {
         return new LobbyService(lobbyRepository);
     }
 
+    /*
+    Other method which worked for me is to comment or remove next two Beans (LobbyRepository and LobbySpringDataRepository)
+    And EntityManager and add annotations which I will leave in WinDatApplication.java class
+     */
     @Bean
     public LobbyRepository lobbyRepository(LobbySpringDataRepository lobbySpringDataRepository) {
         return new JpaLobbyRepositoryAdapter(lobbySpringDataRepository);
