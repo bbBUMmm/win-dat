@@ -4,7 +4,7 @@ package org.windat.main;
  * Hello world!
  *
  */
-public class App 
+public class WinDatApplication
 {
     public static void main( String[] args )
     {
