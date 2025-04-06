@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:6969/windat_db
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    name: windat_db
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+    mapping-resources:
+      - persistence/orm.xml
+# Kubernetes probes (readiness & liveness) and monitoring
+#management:
+#  endpoint:
+#    health:
+#      probes:
+#        enabled: true
+#      show-details: always
+#  endpoints:
+#    web:
+#      exposure:
+#        incl  ude: "*"

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+        xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        https://jakarta.ee/xml/ns/persistence/orm
+        https://jakarta.ee/xml/ns/persistence/orm/orm_3_0.xsd"
+        version="3.0">
+    <!-- Lobby entity   -->
+    <entity class="org.windat.domain.entity.Lobby" access="FIELD">
+        <table name="LOBBY"/>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+
+            <basic name="name">
+                <column name="NAME" nullable="false"/>
+            </basic>
+
+            <basic name="created">
+                <column name="created" nullable="false"/>
+            </basic>
+
+            <basic name="updated">
+                <column name="updated" nullable="false"/>
+            </basic>
+
+            <basic name="closed">
+                <column name="closed" nullable="false"/>
+            </basic>
+
+            <one-to-many name="userList" target-entity="org.windat.domain.entity.User">
+                <join-table name="LOBBY_USERS">
+                    <join-column name="LOBBY_ID" referenced-column-name="ID"/>
+                    <inverse-join-column name="USER_ID" referenced-column-name="ID"/>
+                </join-table>
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <!-- User entity   -->
+    <entity class="org.windat.domain.entity.User" access="FIELD">
+        <table name="users"/>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="loginName"/>
+            <basic name="userRoleEnum">
+                <column name="role" nullable="false" />
+            </basic>
+            <many-to-one name="lobby" target-entity="org.windat.domain.entity.Lobby">
+                <join-column name="lobby_id"/>
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </many-to-one>
+        </attributes>
+    </entity>
+</entity-mappings>
