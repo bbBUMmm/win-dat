@@ -46,9 +46,8 @@ components:
           type: string
         userRoleEnum:
           $ref: '#/components/schemas/UserRole'
-        lobbyId:
-          type: integer
-          format: int32
+        lobby:
+          $ref: '#/components/schemas/Lobby'
     UserRole:
       type: string
       enum:
