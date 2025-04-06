@@ -24,7 +24,7 @@ public class User {
      * The role of the user within the application, represented by an enumeration.
      * Defines the user's permissions and access levels.
      */
-    private Enum<UserRole> userRoleEnum;
+    private UserRole userRoleEnum;
 
     /**
      * The game lobby the user is currently associated with.
@@ -64,7 +64,7 @@ public class User {
      *
      * @return The user's role as an enumeration.
      */
-    public Enum<UserRole> getUserRoleEnum() {
+    public UserRole getUserRoleEnum() {
         return userRoleEnum;
     }
 
