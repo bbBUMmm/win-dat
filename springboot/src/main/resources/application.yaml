@@ -1,4 +1,10 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/FSA
+          jwk-set-uri: http://localhost:8082/realms/FSA/protocol/openid-connect/certs
   datasource:
     url: jdbc:postgresql://localhost:6969/windat_db
     username: admin
