@@ -9,6 +9,7 @@ import org.windat.rest.dto.LobbyCreateRequestDTODto;
 import org.windat.rest.dto.LobbyDto;
 import org.windat.ws.mapper.LobbyMapper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,9 +38,16 @@ public class LobbyRestController implements LobbiesApi{
     @Override
     public ResponseEntity<List<LobbyDto>> listLobbies() {
         Collection<Lobby> lobbies = lobbyFacade.readAll();
-        List<LobbyDto> lobbyDtos = lobbies.stream()
-                .map(lobbyMapper::toDto)
-                .collect(Collectors.toList());
+        List<LobbyDto> lobbyDtos = new ArrayList<>();
+
+        if (lobbies != null) {
+            lobbyDtos = lobbies.stream()
+                    .map(lobbyMapper::toDto)
+                    .collect(Collectors.toList());
+        }
+//        If lobbyFacade.readAll will return null, then this method will return 200 OK with
+//        Empty array
+//        If it is not null, then there will be array with lobbies
         return ResponseEntity.ok(lobbyDtos);
     }
 }

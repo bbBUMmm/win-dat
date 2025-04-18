@@ -1,5 +1,6 @@
 package org.windat.domain.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,9 @@ public class Lobby {
      * Required for JPA entity instantiation.
      */
     public Lobby(){
+        this.userList = new ArrayList<>();
     }
+
 
     /**
      * Unique identifier for the lobby.
@@ -60,6 +63,9 @@ public class Lobby {
      * @param user The User object to add to the lobby.
      */
     public void addUser(User user){
+        if (user == null) {
+            throw new NullPointerException("User cannot be null");
+        }
         userList.add(user);
     }
 
@@ -69,6 +75,9 @@ public class Lobby {
      * @param user The User object to remove from the lobby.
      */
     public void removeUser(User user){
+        if(user == null){
+            throw new IllegalArgumentException("User cannot be null");
+        }
         userList.remove(user);
     }
 
