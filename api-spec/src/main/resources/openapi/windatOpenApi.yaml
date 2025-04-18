@@ -1,0 +1,119 @@
+openapi: 3.0.0
+info:
+  title: WinDat Platform API
+  version: 1.0.0
+  description: API for managing game lobbies and user interactions within the WinDat platform.
+
+components:
+  schemas:
+    Lobby:
+      type: object
+      required:
+        - id
+        - name
+        - created
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Unique identifier of the lobby
+        name:
+          type: string
+          description: Name of the lobby
+        created:
+          type: string
+          format: date-time
+          description: Time when lobby was created
+        updated:
+          type: string
+          format: date-time
+          description: Time when lobby was updated
+        closed:
+          type: string
+          format: date-time
+          description: Time when lobby was closed
+        userList:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        loginName:
+          type: string
+        userRoleEnum:
+          $ref: '#/components/schemas/UserRole'
+        lobby:
+          $ref: '#/components/schemas/Lobby'
+    UserRole:
+      type: string
+      enum:
+        - USER_ROLE
+        - ADMIN_ROLE
+    LobbyCreateRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+
+paths:
+  /lobbies:
+    get:
+      summary: Get all lobbies
+      operationId: listLobbies
+      tags:
+        - Lobbies
+      responses:
+        '200':
+          description: A list of lobbies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lobby'
+    post:
+      summary: Create a new lobby
+      operationId: createLobby
+      tags:
+        - Lobbies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LobbyCreateRequestDTO'
+      responses:
+        '201':
+          description: Lobby created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '400':
+          description: Invalid request
+  /lobbies/{lobbyId}:
+    get:
+      summary: Get a lobby by ID
+      operationId: getOneLobby
+      tags:
+        - Lobbies
+      parameters:
+        - name: lobbyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: The requested lobby
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '404':
+          description: Lobby not found
