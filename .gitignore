@@ -37,3 +37,10 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Terraform ###
+terraform/resource-group/.terraform/
+terraform/container-registry/.terraform/
+terraform/kubernetes/.terraform
+terraform/public-ip/.terraform
+terraform/psql/.terraform
