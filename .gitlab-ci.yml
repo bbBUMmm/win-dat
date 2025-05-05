@@ -11,7 +11,7 @@ variables:
 build_image:
   stage: build
   tags:
-    fsa-prykhodko
+    - fsa-prykhodko
   image: docker:dind
   services:
     - docker:latest
