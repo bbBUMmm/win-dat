@@ -1,8 +1,8 @@
 stages:
   - build
 variables:
-  CONTAINER_REGISTRY: "https://fsapieterrregistry.azurecr.io"
-  DOCKER_REPOSITORY: "fsapieterrregistry.azurecr.io"
+  CONTAINER_REGISTRY: "https://prykhodkofsatfstateregistry.azurecr.io"
+  DOCKER_REPOSITORY: "prykhodkofsatfstateregistry.azurecr.io"
   IMAGE_NAME: "fsa-backend"
   DOCKER_DRIVER: overlay2
   DOCKER_HOST: tcp://127.0.0.1:2375
@@ -11,7 +11,7 @@ variables:
 build_image:
   stage: build
   tags:
-    - fsa-pieterr
+    - fsa-prykhodko
   image: docker:dind
   services:
     - docker:latest
@@ -24,4 +24,4 @@ build_image:
     - docker push "$DOCKER_REPOSITORY/$IMAGE_NAME:$IMAGE_VERSION"
     - docker push "$DOCKER_REPOSITORY/$IMAGE_NAME:latest"
   only:
-    - master
+    - main
