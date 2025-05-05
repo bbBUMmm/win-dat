@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gitlab.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "gitlab.name" . }}
+    helm.sh/chart: {{ include "gitlab.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "gitlab.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "gitlab.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}-ce.0"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: {{ toJson .Values.command }}
+        env:
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        {{- range .Values.env }}
+        - name: {{ .name }}
+          {{- if .valueFrom }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .valueFrom.secretName }}
+              key: {{ .valueFrom.secretKey }}
+          {{- else }}
+          value: {{ .value | quote }}
+          {{- end }}
+        {{- end }}
+        ports:
+        {{- range .Values.service.ports }}
+          - name: {{ .name }}
+            containerPort: {{ .targetPort }}
+            protocol: {{ .protocol }}
+        {{- end }}
+        resources:
+          requests:
+            memory: "{{ .Values.resources.requests.memory }}"
+            cpu: "{{ .Values.resources.requests.cpu }}"
+          limits:
+            memory: "{{ .Values.resources.limits.memory }}"
+            cpu: "{{ .Values.resources.limits.cpu }}"
+        volumeMounts:
+        {{- range .Values.volumes }}
+          - mountPath: {{ .mountPath }}
+            name: {{ $.Values.gitlab.name }}-{{ .name }}
+        {{- end }}
+      volumes:
+      {{- range .Values.volumes }}
+        - name: {{ $.Values.gitlab.name }}-{{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ $.Values.gitlab.name }}-{{ .name }}
+      {{- end }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}      

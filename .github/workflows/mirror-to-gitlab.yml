@@ -1,0 +1,22 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Push to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GPAT }}
+#          resolve this when will be automating this workflow
+#        run: |
+#          git remote add gitlab https://prykhodko.mykyta:${GITLAB_TOKEN}@gitlab.fullstackacademy.sk/fsa-pieterr/fsa-infrastructure.git
+#          git push --mirror gitlab

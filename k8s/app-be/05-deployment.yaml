@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fsa-be
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fsa-be
+  template:
+    metadata:
+      labels:
+        app: fsa-be
+    spec:
+      containers:
+        - name: fsa-be
+          image: fsapieterrregistry.azurecr.io/fsa-backend:latest
+          imagePullPolicy: Always
+          env:
+            # Nacitanie citlivych udajov pre DB z K8s secrets
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: db_url
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: db_password
+            - name: ISSUER_URI
+              value: keycloak.fullstackacademy.sk/auth/realms/FSA
+            - name: JWT_URI
+              value: keycloak.fullstackacademy.sk/auth/realms/FSA/protocol/openid-connect/certs
+            # Override casti Spring Boot konfiguracie kvoli citlivym udajom
+            - name: JAVA_OPTS
+              value: >-
+                -Dspring.datasource.url=jdbc:postgresql://${DB_URL}:5432/fsa-db
+                -Dspring.datasource.username=${DB_USERNAME}
+                -Dspring.datasource.password=${DB_PASSWORD}
+                -Dspring.security.oauth2.resourceserver.jwt.issuer-uri=${ISSUER_URI}
+                -Dspring.security.oauth2.resourceserver.jwt.jwk-uri=${JWT_URI}
+          resources:
+            # TODO: nastavit podla metrik podu, toto su len odhadnute hodnoty
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 250Mi
+          ports:
+            - name: http
+              containerPort: 8080
+          # FSA mozete nechat zakomentovane, kedze nemate implementovane health checky - sluzi iba ako ukazka
+          # livenessProbe:
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+          #   successThreshold: 1
+          #   failureThreshold: 5
+          #   httpGet:
+          #     path: /actuator/health
+          #     port: http
+          # readinessProbe:
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+          #   successThreshold: 1
+          #   failureThreshold: 5
+          #   httpGet:
+          #     path: /actuator/health
+          #     port: http

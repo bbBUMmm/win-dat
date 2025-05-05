@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fsa
+  namespace: app
+  labels:
+    app: fsa
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "256k"
+    nginx/client_max_body_size: 10m
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      # FSA toto si vo finale budete musiet pomenit na zaklade Vasej aplikacie
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: fsa-fe
+            port:
+              number: 80
+      - path: /discussion-messages
+        pathType: Prefix
+        backend:
+          service:
+            name: fsa-be
+            port:
+              number: 8080
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: fsa-keycloak-http
+            port:
+              number: 80

@@ -1,6 +1,3 @@
-# export ACR=$(op read "op://fsa2024/FSA2024 ACR common/url")
-# export ACR_USER=$(op read "op://fsa2024/FSA2024 ACR common/username")
-# export ACR_PASSWORD=$(op read "op://fsa2024/FSA2024 ACR common/password")
 
 IMAGE := fsa-keycloak
 TAG := 23.0

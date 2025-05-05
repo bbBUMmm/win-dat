@@ -1,0 +1,14 @@
+{{- range .Values.volumes }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $.Values.gitlab.name }}-{{ .name }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .storageClassName }}
+  resources:
+    requests:
+      storage: {{ .storage }}
+---
+{{- end }}
