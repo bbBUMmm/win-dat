@@ -1,0 +1,87 @@
+# Default values for gitlab-ce.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+gitlab:
+  name: fsa-gitlab
+nameOverride: ""
+fullnameOverride: "fsa-gitlab"
+
+replicaCount: 1
+
+image:
+  repository: gitlab/gitlab-ce
+  tag: 17.2.0
+  pullPolicy: Always
+
+strategy:
+  type: Recreate
+
+command: ["/bin/bash", "-c", "exec /assets/wrapper"]
+
+resources:
+  requests:
+    memory: "1024Mi"
+    cpu: "1000m"
+  limits:
+    memory: "4096Mi"
+    cpu: "3000m"
+
+service:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+
+env:
+  - name: EXTERNAL_URL
+    value: "https://gitlab.fullstackacademy.sk"
+  - name: APP_GIT_ID
+    valueFrom:
+      secretName: gitlab-azure-secret
+      secretKey: client_id
+  - name: APP_GIT_SECRET
+    valueFrom:
+      secretName: gitlab-azure-secret
+      secretKey: client_secret
+  - name: TENANT_ID
+    value: "XXXXXXXXXXXXXXXXXXXXXXXX"
+  - name: GITLAB_ROOT_PASSWORD
+    valueFrom:
+      secretName: gitlab-secret
+      secretKey: password
+  - name: GITLAB_OMNIBUS_CONFIG
+    value: |
+      prometheus['enable'] = false
+      prometheus_monitoring['enable'] = false
+      gitlab_rails['omniauth_providers'] = [{'name'=>'azure_activedirectory_v2', 'args'=>{'client_id' => $APP_GIT_ID, 'client_secret' => $APP_GIT_SECRET, 'tenant_id' => $TENANT_ID, "access_type" => "offline", "approval_prompt" => ""}}]
+      gitlab_rails['gitlab_signup_enabled'] = false
+      gitlab_rails['omniauth_enabled'] = true
+      gitlab_rails['omniauth_allow_single_sign_on'] = ['azure_activedirectory_v2']
+      gitlab_rails['omniauth_sync_email_from_provider'] = 'azure_activedirectory_v2'
+      gitlab_rails['omniauth_sync_profile_from_provider'] = ['azure_activedirectory_v2']
+      gitlab_rails['omniauth_sync_profile_attributes'] = ['email', 'name', 'location']
+      gitlab_rails['omniauth_block_auto_created_users'] = false
+      gitlab_rails['initial_root_password'] = $GITLAB_ROOT_PASSWORD
+      gitlab_rails['env'] = {'GITLAB_ROOT_PASSWORD' => $GITLAB_ROOT_PASSWORD}
+      external_url $EXTERNAL_URL
+      letsencrypt['enable'] = false
+
+volumes:
+  - name: config
+    storageClassName: default
+    storage: 10Gi
+    mountPath: "/etc/gitlab/"
+  - name: logs
+    storageClassName: default
+    storage: 10Gi
+    mountPath: "/var/log/gitlab/"
+  - name: data
+    storageClassName: default
+    storage: 10Gi
+    mountPath: "/var/opt/gitlab/"
+
+nodeSelector: {}
+  # statefull: "true"

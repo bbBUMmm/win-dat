@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fsa-fe
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fsa-fe
+  template:
+    metadata:
+      labels:
+        app: fsa-fe
+    spec:
+      containers:
+        - name: fsa-fe
+          image: fsapieterrregistry.azurecr.io/fsa-frontend:latest
+          imagePullPolicy: Always
+          resources:
+            # TODO: nastavit podla metrik podu, toto su len odhadnute hodnoty
+            limits:
+              cpu: 250m
+              memory: 250Mi
+            requests:
+              cpu: 150m
+              memory: 150Mi
+          ports:
+            - name: http
+              containerPort: 80
+          # livenessProbe:
+          #   httpGet:
+          #     # TODO: zmenit na nejaky validny endpoint
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     # TODO: zmenit na nejaky validny endpoint
+          #     path: /
+          #     port: http

@@ -1,0 +1,120 @@
+# Default values for gitlab-ce.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+gitlab:
+  name: fsa-gitlab
+nameOverride: ""
+fullnameOverride: "fsa-gitlab"
+
+replicaCount: 1
+
+image:
+  repository: gitlab/gitlab-ce
+  tag: 17.2.9
+  pullPolicy: Always
+
+strategy:
+  type: Recreate
+
+command: ["/bin/bash", "-c", "exec /assets/wrapper"]
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "200m"
+  limits:
+    memory: "4000Mi"
+    cpu: "2000m"
+
+service:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+
+env:
+  - name: EXTERNAL_URL
+    value: "https://gitlab.fullstackacademy.sk"
+  - name: CLIENT_ID
+    valueFrom:
+      secretName: gitlab-azure-secret
+      secretKey: client_id
+  - name: CLIENT_SECRET
+    valueFrom:
+      secretName: gitlab-azure-secret
+      secretKey: client_secret
+  - name: TENANT_ID
+    valueFrom:
+      secretName: gitlab-azure-secret
+      secretKey: tenant_id
+  - name: GITLAB_ROOT_PASSWORD
+    valueFrom:
+      secretName: gitlab-secret
+      secretKey: password
+  - name: GITLAB_OMNIBUS_CONFIG
+    value: |
+      external_url ENV['EXTERNAL_URL']    
+      prometheus['enable'] = false
+      prometheus_monitoring['enable'] = false
+      gitlab_rails['omniauth_enabled'] = true
+      gitlab_rails['omniauth_allow_single_sign_on'] = ['openid_connect']
+      gitlab_rails['omniauth_sync_profile_attributes'] = ['email', 'name']
+      gitlab_rails['omniauth_block_auto_created_users'] = false
+      gitlab_rails['gitlab_signup_enabled'] = false
+      nginx['client_max_body_size'] = '100m'
+      gitlab_rails['git_max_size'] = 1048576000 
+      gitlab_rails['omniauth_providers'] = [
+        {
+          name: "openid_connect",
+          label: "Azure OIDC",
+          args: {
+            name: "openid_connect",
+            scope: ["openid", "profile", "email"],
+            response_type: "code",
+            issuer: "https://login.microsoftonline.com/#{ENV['TENANT_ID']}/v2.0",
+            client_auth_method: "query",
+            discovery: true,
+            uid_field: "preferred_username",
+            pkce: true,
+            client_options: {
+              identifier: ENV['CLIENT_ID'],
+              secret: ENV['CLIENT_SECRET'],
+              redirect_uri: "#{ENV['EXTERNAL_URL']}/users/auth/openid_connect/callback"
+            }
+          }
+        }
+      ]
+      gitlab_rails['initial_root_password'] = ENV['GITLAB_ROOT_PASSWORD']
+      gitlab_rails['env'] = {
+        'GITLAB_ROOT_PASSWORD' => ENV['GITLAB_ROOT_PASSWORD']
+      }
+      letsencrypt['enable'] = false
+      gitlab_kas['enable'] = false
+      nginx['listen_port'] = 80
+      nginx['listen_https'] = false
+      
+      # Tell GitLab that SSL is handled by your reverse proxy
+      nginx['proxy_set_headers'] = {
+        "X-Forwarded-Proto" => "https",
+        "X-Forwarded-Ssl" => "on"
+      }
+
+volumes:
+  - name: config
+    storageClassName: default
+    storage: 20Gi
+    mountPath: "/etc/gitlab/"
+  - name: logs
+    storageClassName: default
+    storage: 20Gi
+    mountPath: "/var/log/gitlab/"
+  - name: data
+    storageClassName: default
+    storage: 20Gi
+    mountPath: "/var/opt/gitlab/"
+
+nodeSelector: {}
+  # statefull: "true"

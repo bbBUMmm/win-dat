@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloak-ingress
+  namespace: app
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx/client_max_body_size: 10m
+    nginx.ingress.kubernetes.io/app-root: /auth
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: fsa-prykhodko.northeurope.cloudapp.azure.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-keycloak-http
+                port:
+                  number: 80

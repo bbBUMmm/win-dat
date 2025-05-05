@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fsa-be
+  namespace: app
+  labels:
+    app: fsa-be
+spec:
+  selector:
+    app: fsa-be
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+  type: ClusterIP
