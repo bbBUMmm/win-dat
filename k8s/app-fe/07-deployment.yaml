@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: fsa-fe
-          image: fsapieterrregistry.azurecr.io/fsa-frontend:latest
+          image: prykhodkofsatfstateregistry.azurecr.io/fsa-frontend:latest
           imagePullPolicy: Always
           resources:
             # TODO: nastavit podla metrik podu, toto su len odhadnute hodnoty

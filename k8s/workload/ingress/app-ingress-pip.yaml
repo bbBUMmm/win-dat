@@ -21,7 +21,7 @@ spec:
             name: fsa-fe
             port:
               number: 80
-      - path: /discussion-messages
+      - path: /lobbies
         pathType: Prefix
         backend:
           service:
