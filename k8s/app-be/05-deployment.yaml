@@ -35,9 +35,9 @@ spec:
                   name: postgres-secret
                   key: db_password
             - name: ISSUER_URI
-              value: http://4.245.186.27/auth/realms/FSA
+              value: http://4.245.186.27/auth/realms/WinDat
             - name: JWT_URI
-              value: http://4.245.186.27/auth/realms/FSA/protocol/openid-connect/certs
+              value: http://4.245.186.27/auth/realms/WinDat/protocol/openid-connect/certs
             # Override casti Spring Boot konfiguracie kvoli citlivym udajom
             - name: JAVA_OPTS
               value: >-
