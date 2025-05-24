@@ -27,12 +27,21 @@ public class LobbyRestController implements LobbiesApi{
 
     @Override
     public ResponseEntity<LobbyDto> createLobby(LobbyCreateRequestDTODto lobbyCreateRequestDTODto) {
-        return null;
+        Lobby newLobby = this.lobbyMapper.dtoToEntity(lobbyCreateRequestDTODto);
+        Lobby savedLobby = this.lobbyFacade.create(newLobby);
+        LobbyDto lobbyDto = this.lobbyMapper.toDto(savedLobby);
+        return ResponseEntity.ok(lobbyDto);
     }
 
     @Override
     public ResponseEntity<LobbyDto> getOneLobby(Integer lobbyId) {
-        return null;
+        if (this.lobbyFacade.readOne(lobbyId).isPresent()) {
+            Lobby retrievedLobby = this.lobbyFacade.readOne(lobbyId).get();
+            LobbyDto lobbyDto = this.lobbyMapper.toDto(retrievedLobby);
+            return ResponseEntity.ok(lobbyDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.windat.domain.repository.LobbyRepository;
 import org.windat.jpa.repository.LobbySpringDataRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Repository
 public class JpaLobbyRepositoryAdapter implements LobbyRepository {
@@ -24,5 +25,11 @@ public class JpaLobbyRepositoryAdapter implements LobbyRepository {
     @Override
     public Lobby create(Lobby lobby) {
         return lobbySpringDataRepository.save(lobby);
+    }
+
+
+    @Override
+    public Optional<Lobby> readOne(Integer id) {
+        return lobbySpringDataRepository.findById(id);
     }
 }

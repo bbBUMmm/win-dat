@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.windat.domain.entity.Lobby;
+import org.windat.rest.dto.LobbyCreateRequestDTODto;
 import org.windat.rest.dto.LobbyDto;
 
 import java.time.OffsetDateTime;
@@ -25,4 +26,10 @@ public interface LobbyMapper {
         }
         return date.toInstant().atOffset(ZoneOffset.UTC);
     }
+
+    @Mapping(source = "name", target = "name")
+    @Mapping(target = "created", ignore = true)
+    @Mapping(target = "updated", ignore = true)
+    @Mapping(target = "closed", ignore = true)
+    Lobby dtoToEntity(LobbyCreateRequestDTODto dto);
 }

@@ -88,7 +88,7 @@ public class Lobby {
      * Note: The logic `userList.size() > 2` indicates that the lobby can hold a maximum of 2 users.
      */
     public boolean isFull(){
-        return this.userList.size() > 2;
+        return this.userList.size() >= 2;
     }
 
     /*
@@ -103,12 +103,28 @@ public class Lobby {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<User> getUserList() {
         return userList;
     }
 
     public Date getCreated() {
         return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    public void setClosed(Date closed) {
+        this.closed = closed;
     }
 
     public Date getUpdated() {
