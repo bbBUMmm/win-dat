@@ -27,10 +27,11 @@ class JwtConverter extends AbstractAuthenticationToken {
     @Override
     public Object getPrincipal() {
         UserDto userDto = new UserDto();
-//        userDto.setEmail(source.getClaimAsString("email"));
-//        userDto.setName(source.getClaimAsString("given_name"));
-//        userDto.setRola(getRole());
-        userDto.setLoginName(source.getClaimAsString("login_name"));
+        userDto.setKeycloakId(UUID.fromString(source.getSubject()));
+        userDto.setLoginName(source.getClaim("preferred_username"));
+//        I will comment out this for now
+//        Letter need to implement role checking and do thing based on that
+//        userDto.setUserRoleEnum(UserRoleDto.USER_ROLE);
         return userDto;
     }
 

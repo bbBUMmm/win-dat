@@ -49,15 +49,18 @@
             <id name="id">
                 <generated-value strategy="IDENTITY"/>
             </id>
+            <basic name="keycloakId">
+                <column name="keycloak_id" nullable="false" unique="true"/>
+            </basic>
             <basic name="loginName"/>
             <basic name="userRoleEnum">
                 <column name="role" nullable="false" />
             </basic>
             <many-to-one name="lobby" target-entity="org.windat.domain.entity.Lobby">
                 <join-column name="lobby_id"/>
-                <cascade>
-                    <cascade-all/>
-                </cascade>
+<!--                <cascade>-->
+<!--                    <cascade-all/>-->
+<!--                </cascade>-->
             </many-to-one>
         </attributes>
     </entity>

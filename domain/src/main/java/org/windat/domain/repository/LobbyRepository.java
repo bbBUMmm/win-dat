@@ -12,4 +12,6 @@ public interface LobbyRepository {
     Lobby create(Lobby lobby);
 
     Optional<Lobby> readOne(Integer id);
+
+    Lobby update(Lobby lobby);
 }

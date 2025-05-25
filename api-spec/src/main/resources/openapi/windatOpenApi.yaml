@@ -42,12 +42,18 @@ components:
         id:
           type: integer
           format: int32
+        keycloakId:
+          type: string
+          format: uuid
+          description: Unique keycloak identifier
         loginName:
           type: string
         userRoleEnum:
           $ref: '#/components/schemas/UserRole'
-        lobby:
-          $ref: '#/components/schemas/Lobby'
+        lobbyId:
+          type: integer
+          format: int32
+          description: ID of the lobby the user is currently associated with.
     UserRole:
       type: string
       enum:
@@ -117,3 +123,31 @@ paths:
                 $ref: '#/components/schemas/Lobby'
         '404':
           description: Lobby not found
+  /lobbies/{lobbyId}/users:
+    post:
+      summary: Add user to lobby
+      operationId: addUserToLobby
+      tags:
+        - Lobbies
+      parameters:
+        - name: lobbyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the lobby to add the user to
+      responses:
+        '200':
+          description: User was successfully added to lobby
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '401':
+          description: Unauthorized — user not authenticated
+        '404':
+          description: Lobby not found
+        '409':
+          description: User is already in the lobby
+

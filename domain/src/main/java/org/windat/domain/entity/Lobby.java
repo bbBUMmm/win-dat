@@ -67,6 +67,7 @@ public class Lobby {
             throw new NullPointerException("User cannot be null");
         }
         userList.add(user);
+        user.setLobby(this);
     }
 
     /**
@@ -89,6 +90,15 @@ public class Lobby {
      */
     public boolean isFull(){
         return this.userList.size() >= 2;
+    }
+
+    /**
+     * Checks if lobby already has specific user
+     *
+     * @return boolean
+     */
+    public boolean containsUser(User user){
+        return userList.contains(user);
     }
 
     /*

@@ -15,4 +15,6 @@ public interface LobbyFacade {
     Lobby create(Lobby lobby);
 
     Optional<Lobby> readOne(Integer lobbyId);
+
+    Lobby update(Lobby lobby);
 }

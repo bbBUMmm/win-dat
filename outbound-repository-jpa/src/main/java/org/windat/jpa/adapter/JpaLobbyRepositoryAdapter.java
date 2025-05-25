@@ -32,4 +32,9 @@ public class JpaLobbyRepositoryAdapter implements LobbyRepository {
     public Optional<Lobby> readOne(Integer id) {
         return lobbySpringDataRepository.findById(id);
     }
+
+    @Override
+    public Lobby update(Lobby lobby) {
+        return lobbySpringDataRepository.save(lobby);
+    }
 }

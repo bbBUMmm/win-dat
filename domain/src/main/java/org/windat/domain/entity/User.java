@@ -2,6 +2,8 @@ package org.windat.domain.entity;
 
 import org.windat.domain.UserRole;
 
+import java.util.UUID;
+
 /**
  * Represents a user within the application.
  * This class encapsulates the state and behavior of a user, including their unique
@@ -14,6 +16,12 @@ public class User {
      * Used as the primary key in the database.
      */
     private int id;
+
+    /**
+     * Unique keycloak identifier
+     * Used to find specific user in keycloak database
+     */
+    private UUID keycloakId;
 
     /**
      * The login name of the user, used for authentication and identification.
@@ -75,5 +83,37 @@ public class User {
      */
     public Lobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Gets id of the lobby user is currently in
+     * @return lobby id
+     */
+    public Integer getCurrentLobbyId(){
+        return (this.lobby != null) ? this.lobby.getId() : null;
+    }
+
+
+    /**
+     *
+     */
+    public UUID getKeycloakId() {
+        return keycloakId;
+    }
+
+    public void setKeycloakId(UUID keycloakId) {
+        this.keycloakId = keycloakId;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
+
+    public void setUserRoleEnum(UserRole userRoleEnum) {
+        this.userRoleEnum = userRoleEnum;
+    }
+
+    public void setLobby(Lobby lobby) {
+        this.lobby = lobby;
     }
 }

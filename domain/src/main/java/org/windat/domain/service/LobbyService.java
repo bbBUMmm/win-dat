@@ -45,4 +45,9 @@ public class LobbyService implements LobbyFacade {
         return lobbyRepository.readOne(lobbyId);
     }
 
+    @Override
+    @Transactional
+    public Lobby update(Lobby lobby) {
+        return lobbyRepository.update(lobby);
+    }
 }
