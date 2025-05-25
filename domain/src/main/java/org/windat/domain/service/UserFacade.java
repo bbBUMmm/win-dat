@@ -15,4 +15,7 @@ public interface UserFacade {
     Optional<User> readOne(UUID uuid);
 
     User update(User user);
+
+//    Use this method to retrieve user from the application database
+    Optional<User> readOne(Integer id);
 }

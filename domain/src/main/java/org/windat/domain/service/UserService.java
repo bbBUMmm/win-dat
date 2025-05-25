@@ -38,4 +38,9 @@ public class UserService implements UserFacade{
     public User update(User user) {
         return userRepository.update(user);
     }
+
+    @Override
+    public Optional<User> readOne(Integer id) {
+        return userRepository.readOne(id);
+    }
 }

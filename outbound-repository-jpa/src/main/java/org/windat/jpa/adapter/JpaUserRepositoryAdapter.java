@@ -36,4 +36,9 @@ public class JpaUserRepositoryAdapter implements UserRepository {
         return userSpringDataRepository.save(user);
     }
 
+    @Override
+    public Optional<User> readOne(Integer id) {
+        return userSpringDataRepository.findById(id);
+    }
+
 }

@@ -15,4 +15,6 @@ public interface UserRepository {
     Optional<User> readOne(UUID uuid);
 
     User update(User user);
+
+    Optional<User> readOne(Integer id);
 }
