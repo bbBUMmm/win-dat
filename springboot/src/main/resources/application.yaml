@@ -31,3 +31,11 @@ management:
     web:
       exposure:
         include: "*"
+
+keycloak:
+#  Change this url in production
+  auth-server-url: http://localhost:8082
+  realm: WinDat
+  admin-cli:
+    client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}

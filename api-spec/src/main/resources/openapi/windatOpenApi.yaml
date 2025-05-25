@@ -64,6 +64,39 @@ components:
       properties:
         name:
           type: string
+    UserCreateRequest:
+      type: object
+      required:
+        - username
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+#        That will be username on the page
+        username:
+          type: string
+          description: User's chosen username
+          example: ThatWillBeUsername
+        firstName:
+          type: string
+          description: User's first name
+          example: Test
+        lastName:
+          type: string
+          description: User's last name
+          example: Admin
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: ThatWillBeUsername@gmail.com
+        password:
+          type: string
+          format: password
+          description: User's chosen password
+          minLength: 8
+          example: StrongPassword123!
 
 paths:
   /lobbies:
@@ -150,4 +183,28 @@ paths:
           description: Lobby not found
         '409':
           description: User is already in the lobby
-
+  /users:
+    post:
+      summary: Create user in keycloak and save it to the application database
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request payload (missing required fields, invalid email format)
+        '409':
+          description: User with provided username or email already exists
+        '500':
+          description: Internal server error

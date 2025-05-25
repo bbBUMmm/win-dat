@@ -56,17 +56,17 @@ public class GlobalExceptionHandler {
     }
 
     // General error handler
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Object> handleAllUncaughtException(Exception exception) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("error", "Internal Server Error");
-
-//        Possible error message for client
-        body.put("message", "An unexpected error occurred. Please try again later.");
-
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ResponseEntity<Object> handleAllUncaughtException(Exception exception) {
+//        Map<String, Object> body = new LinkedHashMap<>();
+//        body.put("timestamp", LocalDateTime.now());
+//        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+//        body.put("error", "Internal Server Error");
+//
+////        Possible error message for client
+//        body.put("message", "An unexpected error occurred. Please try again later.");
+//
+//        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 }
