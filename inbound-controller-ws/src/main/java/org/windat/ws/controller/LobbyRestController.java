@@ -2,13 +2,13 @@ package org.windat.ws.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 import org.windat.domain.UserRole;
 import org.windat.domain.entity.Lobby;
 import org.windat.domain.entity.User;
-import org.windat.domain.exceptions.LobbyFullException;
-import org.windat.domain.exceptions.LobbyNotFoundException;
-import org.windat.domain.exceptions.UserAlreadyInLobbyException;
+import org.windat.domain.exceptions.*;
 import org.windat.domain.service.LobbyFacade;
 import org.windat.domain.service.UserFacade;
 import org.windat.rest.api.LobbiesApi;
@@ -131,5 +131,96 @@ public class LobbyRestController implements LobbiesApi {
 //        Empty array
 //        If it is not null, then there will be array with lobbies
         return ResponseEntity.ok(lobbyDtos);
+    }
+
+    /**
+     * Allows an authenticated user to remove themselves from their current lobby.
+     * The lobby ID is retrieved from the user's current association.
+     *
+     * @return ResponseEntity containing the updated LobbyDto (representing the lobby after removal)
+     * or an error status.
+     * @throws UserNotFoundException if the authenticated user is not found in the application database.
+     * @throws UserIsNotInAnyLobbyException if the authenticated user is not currently associated with any lobby.
+     */
+    @Override
+    public ResponseEntity<LobbyDto> removeAuthenticatedUserFromLobby() {
+
+//        Get keycloak user from jwt token
+        UserDto userDto = (UserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UUID keycloakId = userDto.getKeycloakId();
+
+//        Get application user from keycloakId
+        User applicationUser = userFacade.readOne(keycloakId).orElseThrow(
+                () -> new UserNotFoundException("User with " + keycloakId + " not found in the application database.")
+        );
+
+//        Check if user is in any lobby
+        if (!applicationUser.hasAnyLobby()) {
+            throw new UserIsNotInAnyLobbyException("User " + applicationUser.getLoginName() + " is not in any lobby.");
+        }
+
+//        Get lobby form the user
+        Lobby lobby = applicationUser.getLobby();
+
+//        Remove this user from the lobby
+        lobby.removeUser(applicationUser);
+//        Persist updated lobby
+        lobbyFacade.update(lobby);
+
+//        Explicitly set user lobby to null
+        applicationUser.setLobby(null);
+//        Persist updated user
+        userFacade.update(applicationUser);
+
+        return ResponseEntity.ok(lobbyMapper.toDto(lobby));
+    }
+
+    /**
+     * Allows an administrator to remove a specific user from a specific lobby.
+     * This operation requires admin privileges.
+     *
+     * @param lobbyId The ID of the lobby from which to remove the user.
+     * @param userId Application user id.
+     *
+     * @return ResponseEntity containing the updated LobbyDto or an error status.
+     * @throws LobbyNotFoundException if the specified lobby does not exist.
+     * @throws UserNotFoundException if the user to be removed is not found in the application database.
+     * @throws UserIsNotInAnyLobbyException if the specified user is not in the specified lobby.
+     *      * @throws org.springframework.security.access.AccessDeniedException if the authenticated user does not have ADMIN_ROLE.
+     */
+    @Override
+    public ResponseEntity<LobbyDto> removeUserFromLobbyAsAdmin(Integer lobbyId, Integer userId) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getAuthorities().stream()
+                .noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN_ROLE"))) {
+            throw new org.springframework.security.access.AccessDeniedException("Access Denied: Only ADMIN_ROLE users can perform this operation.");
+        }
+
+//        Get the lobby
+        Lobby lobby = lobbyFacade.readOne(lobbyId)
+                .orElseThrow(() -> new LobbyNotFoundException("Lobby with ID " + lobbyId + " not found."));
+
+//        Get user
+        User userToRemove = userFacade.readOne(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with Keycloak ID '" + userId + "' not found in the application database."));
+
+
+//        Check if users is in this specific lobby
+        if (!userToRemove.hasAnyLobby() || !(userToRemove.getLobby().getId() == lobby.getId())) {
+            throw new UserIsNotInAnyLobbyException("User '" + userToRemove.getLoginName() + "' (ID: " + userToRemove.getKeycloakId() + ") is not in lobby with ID " + lobbyId + ".");
+        }
+
+//        Remove user from the lobby
+        lobby.removeUser(userToRemove);
+//        Persist changes
+        lobbyFacade.update(lobby);
+
+//        Explicitly set user lobby to null
+        userToRemove.setLobby(null);
+//        Persist changes
+        userFacade.update(userToRemove);
+
+        return ResponseEntity.ok(lobbyMapper.toDto(lobby));
     }
 }

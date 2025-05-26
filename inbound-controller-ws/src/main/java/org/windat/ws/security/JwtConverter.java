@@ -1,6 +1,8 @@
 package org.windat.ws.security;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.windat.rest.dto.UserDto;
 import org.windat.rest.dto.UserRoleDto;
@@ -33,6 +35,48 @@ class JwtConverter extends AbstractAuthenticationToken {
 //        Letter need to implement role checking and do thing based on that
 //        userDto.setUserRoleEnum(UserRoleDto.USER_ROLE);
         return userDto;
+    }
+
+    @Override
+    public Collection<GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> authorities = new HashSet<>(); // Використовуємо HashSet для уникнення дублікатів
+
+//        Get real roles from jwt
+        if (source.hasClaim("realm_access")) {
+            Map<String, Object> realmAccess = source.getClaimAsMap("realm_access");
+            if (realmAccess != null && realmAccess.containsKey("roles")) {
+                Object rolesObject = realmAccess.get("roles");
+                if (rolesObject instanceof List) {
+                    ((List<?>) rolesObject).stream()
+                            .filter(String.class::isInstance)
+                            .map(String.class::cast)
+//                            Add prefix role
+                            .map(roleName -> new SimpleGrantedAuthority("ROLE_" + roleName))
+                            .forEach(authorities::add);
+                }
+            }
+        }
+
+//        Get client roles from token
+        if (source.hasClaim("resource_access")) {
+            Map<String, Object> resourceAccess = source.getClaimAsMap("resource_access");
+//            Here it is hardcoded for the fsa-client client
+            if (resourceAccess != null && resourceAccess.containsKey("fsa-client")) {
+                Map<String, Object> accountClient = (Map<String, Object>) resourceAccess.get("account");
+                if (accountClient.containsKey("roles")) {
+                    Object rolesObject = accountClient.get("roles");
+                    if (rolesObject instanceof List) {
+                        ((List<?>) rolesObject).stream()
+                                .filter(String.class::isInstance)
+                                .map(String.class::cast)
+                                .map(roleName -> new SimpleGrantedAuthority("ROLE_" + roleName))
+                                .forEach(authorities::add);
+                    }
+                }
+            }
+        }
+
+        return authorities;
     }
 
     private UserRoleDto getRole() {

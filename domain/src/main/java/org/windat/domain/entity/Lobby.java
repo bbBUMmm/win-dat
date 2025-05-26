@@ -80,6 +80,7 @@ public class Lobby {
             throw new IllegalArgumentException("User cannot be null");
         }
         userList.remove(user);
+        user.setLobby(null);
     }
 
     /**

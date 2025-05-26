@@ -116,4 +116,8 @@ public class User {
     public void setLobby(Lobby lobby) {
         this.lobby = lobby;
     }
+
+    public boolean hasAnyLobby(){
+        return this.lobby != null;
+    }
 }

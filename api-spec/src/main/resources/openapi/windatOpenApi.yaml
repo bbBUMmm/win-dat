@@ -183,6 +183,60 @@ paths:
           description: Lobby not found
         '409':
           description: User is already in the lobby
+  /lobbies/me:
+    delete:
+      summary: Remove authenticated user from their current lobby
+      operationId: removeAuthenticatedUserFromLobby
+      tags:
+        - Lobbies
+      responses:
+        '200':
+          description: Authenticated user was successfully removed from their lobby. Returns the updated lobby object or an empty object if no lobby.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '401':
+          description: Unauthorized. User not authenticated.
+        '404':
+          description: Authenticated user is not currently in any lobby.
+        '500':
+          description: Internal server error.
+  /lobbies/{lobbyId}/users/{userId}:
+    delete:
+      summary: Remove a specific user from lobby (Admin access required)
+      operationId: removeUserFromLobbyAsAdmin
+      tags:
+        - Lobbies
+        - Admin
+      parameters:
+        - name: lobbyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the lobby from which to remove the user
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the user to remove from the lobby
+      responses:
+        '200':
+          description: User was successfully removed from lobby
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '401':
+          description: Unauthorized — user not authenticated
+        '403':
+          description: Forbidden — authenticated user does not have admin privileges
+        '404':
+          description: Lobby or User not found in this lobby
   /users:
     post:
       summary: Create user in keycloak and save it to the application database
