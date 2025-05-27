@@ -43,4 +43,10 @@ public class UserService implements UserFacade{
     public Optional<User> readOne(Integer id) {
         return userRepository.readOne(id);
     }
+
+    @Override
+    public Collection<User> readBest10UsersByWins() {
+        return userRepository.readBest10UsersByWins();
+    }
+
 }

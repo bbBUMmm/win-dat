@@ -18,4 +18,6 @@ public interface UserFacade {
 
 //    Use this method to retrieve user from the application database
     Optional<User> readOne(Integer id);
+
+    Collection<User> readBest10UsersByWins();
 }

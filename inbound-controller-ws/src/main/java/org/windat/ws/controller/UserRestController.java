@@ -22,6 +22,7 @@ import org.windat.ws.mapper.UserMapper;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserRestController implements UsersApi {
@@ -109,6 +110,17 @@ public class UserRestController implements UsersApi {
             }
             throw new RuntimeException(errorMessage);
         }
+    }
+
+    @Override
+    public ResponseEntity<List<UserDto>> getLeaderboard() {
+        Collection<User> topUsers = userFacade.readBest10UsersByWins();
+
+        List<UserDto> userDtos = topUsers.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userDtos);
     }
 
     @Override

@@ -58,6 +58,18 @@ components:
           type: integer
           format: int32
           description: Current credit balance of the user.
+        gamesPlayed:
+          type: integer
+          format: int32
+          description: Total number of games played by the user.
+        gamesWon:
+          type: integer
+          format: int32
+          description: Total number of games won by the user.
+        gamesLost:
+          type: integer
+          format: int32
+          description: Total number of games lost by the user.
     UserRole:
       type: string
       enum:
@@ -353,6 +365,24 @@ paths:
           description: User with provided username or email already exists
         '500':
           description: Internal server error
+  /users/leaderboard:
+    get:
+      summary: Get the top 10 users for the leaderboard, sorted by wins.
+      operationId: getLeaderboard
+      tags:
+        - Users
+        - Leaderboard
+      responses:
+        '200':
+          description: List of the top 10 users on the leaderboard.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error.
   /users/me/transfer:
     post:
       summary: Transfer credits from one user to another.

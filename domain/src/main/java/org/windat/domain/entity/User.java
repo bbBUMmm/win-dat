@@ -47,6 +47,11 @@ public class User {
      */
     private Integer credits;
 
+    private Integer gamesPlayed;
+
+    private Integer gamesWon;
+
+    private Integer gamesLost;
     /**
      * Default constructor for Hibernate to map entities.
      * Initializes a new User instance, setting the initial credit balance to 10,000.
@@ -55,6 +60,9 @@ public class User {
     public User() {
 
         this.credits = 10000;
+        this.gamesPlayed = 0;
+        this.gamesWon = 0;
+        this.gamesLost = 0;
     }
 
     /**
@@ -182,5 +190,29 @@ public class User {
             throw new InsufficientCreditsException("User has insufficient credits.");
         }
         this.credits -= amount;
+    }
+
+    public Integer getGamesPlayed() {
+        return gamesPlayed;
+    }
+
+    public void setGamesPlayed(Integer gamesPlayed) {
+        this.gamesPlayed = gamesPlayed;
+    }
+
+    public Integer getGamesWon() {
+        return gamesWon;
+    }
+
+    public void setGamesWon(Integer gamesWon) {
+        this.gamesWon = gamesWon;
+    }
+
+    public Integer getGamesLost() {
+        return gamesLost;
+    }
+
+    public void setGamesLost(Integer gamesLost) {
+        this.gamesLost = gamesLost;
     }
 }

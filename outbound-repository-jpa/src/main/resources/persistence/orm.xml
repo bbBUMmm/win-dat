@@ -59,6 +59,15 @@
             <basic name="credits">
                 <column name="credits" nullable="false" column-definition="INTEGER DEFAULT 10000"/>
             </basic>
+            <basic name="gamesPlayed">
+                <column name="games_played" nullable="false" column-definition="INTEGER DEFAULT 0"/>
+            </basic>
+            <basic name="gamesWon">
+                <column name="games_won" nullable="false" column-definition="INTEGER DEFAULT 0"/>
+            </basic>
+            <basic name="gamesLost">
+                <column name="games_lost" nullable="false" column-definition="INTEGER DEFAULT 0"/>
+            </basic>
             <many-to-one name="lobby" target-entity="org.windat.domain.entity.Lobby">
                 <join-column name="lobby_id"/>
             </many-to-one>

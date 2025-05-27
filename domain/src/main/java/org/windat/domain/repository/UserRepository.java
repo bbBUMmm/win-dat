@@ -17,4 +17,6 @@ public interface UserRepository {
     User update(User user);
 
     Optional<User> readOne(Integer id);
+
+    Collection<User> readBest10UsersByWins();
 }
