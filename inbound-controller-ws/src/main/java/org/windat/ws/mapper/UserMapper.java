@@ -3,7 +3,7 @@ package org.windat.ws.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.windat.domain.UserRole;
+import org.windat.domain.enums.UserRole;
 import org.windat.domain.entity.User;
 import org.windat.rest.dto.UserDto;
 import org.windat.rest.dto.UserRoleDto;
@@ -15,6 +15,7 @@ public interface UserMapper {
     @Mapping(source = "lobby.id", target = "lobbyId")
     UserDto toDto(User user);
 
+    @Mapping(target = "lobby", ignore = true)
     User toUser(UserDto userDto);
 
     @Named("toDtoShallow")

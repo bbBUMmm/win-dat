@@ -56,12 +56,49 @@
             <basic name="userRoleEnum">
                 <column name="role" nullable="false" />
             </basic>
+            <basic name="credits">
+                <column name="credits" nullable="false" column-definition="INTEGER DEFAULT 10000"/>
+            </basic>
             <many-to-one name="lobby" target-entity="org.windat.domain.entity.Lobby">
                 <join-column name="lobby_id"/>
-<!--                <cascade>-->
-<!--                    <cascade-all/>-->
-<!--                </cascade>-->
             </many-to-one>
         </attributes>
+    </entity>
+
+<!-- CreditTransaction entity -->
+    <entity class="org.windat.domain.entity.CreditTransaction" access="FIELD">
+        <table name="CREDIT_TRANSACTIONS"/>
+        <attributes>
+
+        <id name="id">
+            <generated-value strategy="IDENTITY"/>
+        </id>
+
+        <basic name="amount">
+            <column name="amount" nullable="false"/>
+        </basic>
+
+        <basic name="transactionTime">
+            <column name="transaction_time" nullable="false"/>
+        </basic>
+
+        <basic name="description">
+            <column name="description" length="500" nullable="true"/>
+        </basic>
+
+        <basic name="type">
+            <column name="transaction_type" nullable="false"/>
+            <enumerated>STRING</enumerated>
+        </basic>
+
+        <many-to-one name="relatedUser" target-entity="org.windat.domain.entity.User">
+            <join-column name="related_user_id" nullable="true"/>
+        </many-to-one>
+
+        <many-to-one name="user" target-entity="org.windat.domain.entity.User">
+            <join-column name="user_id" nullable="false"/>
+        </many-to-one>
+
+    </attributes>
     </entity>
 </entity-mappings>

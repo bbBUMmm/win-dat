@@ -1,6 +1,7 @@
 package org.windat.domain.entity;
 
-import org.windat.domain.UserRole;
+import org.windat.domain.enums.UserRole;
+import org.windat.domain.exceptions.InsufficientCreditsException;
 
 import java.util.UUID;
 
@@ -42,11 +43,18 @@ public class User {
     private Lobby lobby;
 
     /**
+     * Represents user balance in the WinDat platform
+     */
+    private Integer credits;
+
+    /**
      * Default constructor for Hibernate to map entities.
+     * Initializes a new User instance, setting the initial credit balance to 10,000.
      * Required for JPA entity instantiation.
      */
     public User() {
 
+        this.credits = 10000;
     }
 
     /**
@@ -119,5 +127,60 @@ public class User {
 
     public boolean hasAnyLobby(){
         return this.lobby != null;
+    }
+
+    /**
+     * Retrieves the current credit balance of the user.
+     *
+     * @return The total number of credits the user possesses.
+     */
+    public Integer getCredits() {
+        return credits;
+    }
+
+    /**
+     * Sets the credit balance for the user.
+     * This method should be used cautiously, typically for initial setup or administrative adjustments.
+     * For adding/deducting credits, use {@link #addCredits(Integer)} and {@link #deductCredits(Integer)}.
+     *
+     * @param credits The new credit balance to set. Must not be null and must be non-negative.
+     * @throws IllegalArgumentException if the provided credits value is null or negative.
+     */
+    public void setCredits(Integer credits) {
+        if (credits == null || credits < 0) {
+            throw new IllegalArgumentException("Credits cannot be null or negative.");
+        }
+        this.credits = credits;
+    }
+
+    /**
+     * Adds a specified amount of credits to the user's current balance.
+     *
+     * @param amount The amount of credits to add. Must be a positive integer.
+     * @throws IllegalArgumentException if the provided amount is negative.
+     */
+    public void addCredits(Integer amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount to add must be positive.");
+        }
+        this.credits += amount;
+    }
+
+
+    /**
+     * Deducts a specified amount of credits from the user's current balance.
+     *
+     * @param amount The amount of credits to deduct. Must be a positive integer.
+     * @throws IllegalArgumentException     if the provided amount is negative or null.
+     * @throws InsufficientCreditsException if the user's current credit balance is less than the amount to deduct.
+     */
+    public void deductCredits(Integer amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount to deduct must be positive.");
+        }
+        if (this.credits < amount) {
+            throw new InsufficientCreditsException("User has insufficient credits.");
+        }
+        this.credits -= amount;
     }
 }

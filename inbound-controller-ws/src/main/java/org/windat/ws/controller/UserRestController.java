@@ -8,11 +8,14 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
-import org.windat.domain.UserRole;
+import org.windat.domain.enums.UserRole;
 import org.windat.domain.entity.User;
+import org.windat.domain.service.CreditFacade;
 import org.windat.domain.service.UserFacade;
 import org.windat.rest.api.UsersApi;
+import org.windat.rest.dto.CreditTransferRequestDto;
 import org.windat.rest.dto.UserCreateRequestDto;
 import org.windat.rest.dto.UserDto;
 import org.windat.ws.mapper.UserMapper;
@@ -26,18 +29,22 @@ public class UserRestController implements UsersApi {
     private final UserFacade userFacade;
     private final UserMapper userMapper;
     private final Keycloak keycloakAdminClient;
+    private final CreditFacade creditFacade;
 
     public UserRestController(
             UserFacade userFacade,
             UserMapper userMapper,
-            Keycloak keycloakAdminClient
+            Keycloak keycloakAdminClient,
+            CreditFacade creditFacade
     ) {
         this.userFacade = userFacade;
         this.userMapper = userMapper;
         this.keycloakAdminClient = keycloakAdminClient;
+        this.creditFacade = creditFacade;
     }
 
     @Override
+//    TODO: REFACTOR THIS CODE. ENCAPSULATE THIS INTO SERVICE SO IT SUITS HEXAGONAL ARCHITECTURE
     public ResponseEntity<UserDto> createUser(UserCreateRequestDto userCreateRequestDto) {
 //        Creating representtion of user for the Keycloak API
         UserRepresentation userRepresentation = new UserRepresentation();
@@ -102,5 +109,21 @@ public class UserRestController implements UsersApi {
             }
             throw new RuntimeException(errorMessage);
         }
+    }
+
+    @Override
+    public ResponseEntity<UserDto> transferCredits(CreditTransferRequestDto creditTransferRequestDto) {
+//        Get user from jwt token
+        UserDto userDto = (UserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UUID senderKeycloakId = userDto.getKeycloakId();
+
+        User updatedSenderDomainUser = creditFacade.transferCredits(
+                senderKeycloakId,
+                creditTransferRequestDto.getReceiverId(),
+                creditTransferRequestDto.getAmount(),
+                creditTransferRequestDto.getDescription()
+        );
+
+        return ResponseEntity.ok(userMapper.toDto(updatedSenderDomainUser));
     }
 }

@@ -1,4 +1,4 @@
-package org.windat.domain;
+package org.windat.domain.enums;
 
 public enum UserRole {
     USER_ROLE,

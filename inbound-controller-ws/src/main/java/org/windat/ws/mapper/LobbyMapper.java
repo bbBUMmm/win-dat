@@ -37,9 +37,4 @@ public interface LobbyMapper {
     @Mapping(target = "updated", ignore = true)
     @Mapping(target = "closed", ignore = true)
     Lobby dtoToEntity(LobbyCreateRequestDTODto dto);
-
-    @Named("dateToOffsetDateTime")
-    static OffsetDateTime map(Date date) {
-        return date == null ? null : date.toInstant().atOffset(ZoneOffset.UTC);
-    }
 }

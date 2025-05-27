@@ -54,6 +54,10 @@ components:
           type: integer
           format: int32
           description: ID of the lobby the user is currently associated with.
+        credits:
+          type: integer
+          format: int32
+          description: Current credit balance of the user.
     UserRole:
       type: string
       enum:
@@ -97,6 +101,93 @@ components:
           description: User's chosen password
           minLength: 8
           example: StrongPassword123!
+    CreditTransferRequest:
+      type: object
+      required:
+        - receiverId
+        - amount
+      properties:
+        receiverId:
+          type: integer
+          format: int32
+          description: The ID of the user who will receive the credits.
+        amount:
+          type: integer
+          format: int32
+          minimum: 1
+          description: The amount of credits to transfer.
+        description:
+          type: string
+          description: Optional description for the transfer.
+          nullable: true
+#          This dto will be returned from the /transaction endpoint
+    CreditTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Unique identifier for the transaction.
+        userId:
+          type: integer
+          format: int32
+          description: Id of user who initiated transaction
+        amount:
+          type: integer
+          format: int32
+          description: Amount of credits transacted (positive for gain, negative for loss).
+        transactionTime:
+          type: string
+          format: date-time
+          description: Timestamp of the transaction.
+        description:
+          type: string
+          description: Description of the transaction (e.g., "Win from match").
+        relatedUserId:
+          type: integer
+          format: int32
+          nullable: true
+        type:
+          $ref: '#/components/schemas/TransactionType'
+#          Enum for the transaction types
+    TransactionType:
+      type: string
+      enum:
+        - MATCH_WIN
+        - MATCH_LOSS
+        - INITIAL_BONUS
+        - ADMIN_ADJUSTMENT
+        - MONTHLY_BONUS
+        - USER_TRANSFER_IN
+        - USER_TRANSFER_OUT
+#         Dto to create a transaction for post /transactions endpoint
+    CreditTransactionRequest:
+      type: object
+      required:
+        - userId
+        - amount
+        - type
+      properties:
+        userId:
+          type: integer
+          format: int32
+          description: The ID of the primary user for this transaction.
+        amount:
+          type: integer
+          format: int32
+          description: The amount of credits for this transaction (positive or negative).
+        description:
+          type: string
+          description: Optional description of the transaction.
+          nullable: true
+        relatedUserId:
+          type: integer
+          format: int32
+          description: The ID of the related user, if applicable.
+          nullable: true
+        type:
+          $ref: '#/components/schemas/TransactionType'
+
 
 paths:
   /lobbies:
@@ -262,3 +353,81 @@ paths:
           description: User with provided username or email already exists
         '500':
           description: Internal server error
+  /users/me/transfer:
+    post:
+      summary: Transfer credits from one user to another.
+      operationId: transferCredits
+      tags:
+        - Users
+        - Credits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditTransferRequest'
+      responses:
+        '200':
+          description: Credits successfully transferred. Returns the updated sender's user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request (e.g., negative amount, senderId equals receiverId).
+        '401':
+          description: Unauthorized - user not authenticated.
+        '403':
+          description: Forbidden - authenticated user is not the sender or does not have sufficient privileges.
+        '404':
+          description: Sender or Receiver user not found.
+        '409':
+          description: Insufficient credits for the transfer.
+  /transactions:
+    get:
+      summary: Get user's credit transaction history.
+      operationId: getCreditTransactions
+      tags:
+        - Credits
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: integer
+            format: int32
+          description: Optional user ID to filter transactions. If not provided, returns transactions for authenticated user.
+      responses:
+        '200':
+          description: List of credit transactions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreditTransaction'
+    post:
+      summary: Record a credit transaction (e.g., admin adjustment, match win/loss).
+      description: This endpoint is primarily for system-initiated transactions (like match outcomes or admin adjustments). Direct user-to-user transfers should use /users/{senderId}/transfer.
+      operationId: createCreditTransaction
+      tags:
+        - Credits
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditTransactionRequest'
+      responses:
+        '201':
+          description: Transaction recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditTransaction'
+        '400':
+          description: Invalid request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (if admin-only).
