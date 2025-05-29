@@ -51,6 +51,13 @@ public class Lobby {
     private Date closed;
 
     /**
+     * Describes amount of credits required from each player to put into game
+     */
+    private Integer amount;
+
+    private String lobbyWinnerUsername;
+
+    /**
      * List of users currently participating in the lobby.
      * Represents the active users within the game session.
      * Note: the list is limited to 2 users in one lobby
@@ -144,5 +151,22 @@ public class Lobby {
 
     public Date getClosed() {
         return closed;
+    }
+
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    public String getLobbyWinnerUsername() {
+        return lobbyWinnerUsername;
+    }
+
+    public void setLobbyWinnerUsername(String lobbyWinnerUsername) {
+        this.lobbyWinnerUsername = lobbyWinnerUsername;
     }
 }

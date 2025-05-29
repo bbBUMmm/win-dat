@@ -11,4 +11,6 @@ public interface UserSpringDataRepository extends JpaRepository<User, Integer> {
     Optional<User> findByKeycloakId(UUID keycloakId);
 
     List<User> findTop10ByOrderByGamesWonDesc();
+
+    Optional<User> findByCs2Username(String username);
 }

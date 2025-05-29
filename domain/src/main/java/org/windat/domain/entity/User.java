@@ -52,6 +52,8 @@ public class User {
     private Integer gamesWon;
 
     private Integer gamesLost;
+
+    private String cs2Username;
     /**
      * Default constructor for Hibernate to map entities.
      * Initializes a new User instance, setting the initial credit balance to 10,000.
@@ -214,5 +216,13 @@ public class User {
 
     public void setGamesLost(Integer gamesLost) {
         this.gamesLost = gamesLost;
+    }
+
+    public String getCs2Username() {
+        return cs2Username;
+    }
+
+    public void setCs2Username(String cs2Username) {
+        this.cs2Username = cs2Username;
     }
 }

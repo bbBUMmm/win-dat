@@ -45,4 +45,9 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     public Collection<User> readBest10UsersByWins() {
         return userSpringDataRepository.findTop10ByOrderByGamesWonDesc();
     }
+
+    @Override
+    public Optional<User> readUserBySteamUsername(String steamUsername) {
+        return userSpringDataRepository.findByCs2Username(steamUsername);
+    }
 }

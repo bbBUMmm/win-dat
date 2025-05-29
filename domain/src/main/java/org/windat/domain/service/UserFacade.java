@@ -20,4 +20,6 @@ public interface UserFacade {
     Optional<User> readOne(Integer id);
 
     Collection<User> readBest10UsersByWins();
+
+    Optional<User> readUserBySteamUsername(String steamUsername);
 }

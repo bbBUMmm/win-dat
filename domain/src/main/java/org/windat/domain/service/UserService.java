@@ -49,4 +49,9 @@ public class UserService implements UserFacade{
         return userRepository.readBest10UsersByWins();
     }
 
+    @Override
+    public Optional<User> readUserBySteamUsername(String steamUsername) {
+        return userRepository.readUserBySteamUsername(steamUsername);
+    }
+
 }

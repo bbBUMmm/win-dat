@@ -3,17 +3,21 @@ package org.windat.ws.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
+import org.windat.domain.entity.CreditTransaction;
+import org.windat.domain.enums.TransactionType;
 import org.windat.domain.enums.UserRole;
 import org.windat.domain.entity.Lobby;
 import org.windat.domain.entity.User;
 import org.windat.domain.exceptions.*;
+import org.windat.domain.service.CreditFacade;
 import org.windat.domain.service.LobbyFacade;
 import org.windat.domain.service.UserFacade;
+import org.windat.rest.api.DuelResultsApi;
+import org.windat.rest.api.DuelWinnerApi;
 import org.windat.rest.api.LobbiesApi;
-import org.windat.rest.dto.LobbyCreateRequestDTODto;
-import org.windat.rest.dto.LobbyDto;
-import org.windat.rest.dto.UserDto;
+import org.windat.rest.dto.*;
 import org.windat.ws.mapper.LobbyMapper;
 import org.windat.ws.mapper.UserMapper;
 
@@ -23,10 +27,11 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
-public class LobbyRestController implements LobbiesApi {
+public class LobbyRestController implements LobbiesApi, DuelResultsApi, DuelWinnerApi {
 
     private final LobbyFacade lobbyFacade;
     private final LobbyMapper lobbyMapper;
+    private final CreditFacade creditFacade;
 
     private final UserFacade userFacade;
     private final UserMapper userMapper;
@@ -35,12 +40,14 @@ public class LobbyRestController implements LobbiesApi {
             LobbyFacade lobbyFacade,
             LobbyMapper lobbyMapper,
             UserFacade userFacade,
-            UserMapper userMapper
+            UserMapper userMapper,
+            CreditFacade creditFacade
     ) {
         this.lobbyFacade = lobbyFacade;
         this.lobbyMapper = lobbyMapper;
         this.userFacade = userFacade;
         this.userMapper = userMapper;
+        this.creditFacade = creditFacade;
     }
 
     /**
@@ -221,5 +228,73 @@ public class LobbyRestController implements LobbiesApi {
         userFacade.update(userToRemove);
 
         return ResponseEntity.ok(lobbyMapper.toDto(lobby));
+    }
+
+//    Make transaction based on winner of the game
+//    User sends money to winner
+    @Override
+    public ResponseEntity<Void> getResultOfCs2Duel(DuelResultPayloadDto duelResultPayloadDto) {
+         String winner = duelResultPayloadDto.getWinner();
+        String loser = duelResultPayloadDto.getLoser();
+
+//        Get loser
+        User loserUser = userFacade.readUserBySteamUsername(loser).orElseThrow(
+                () -> new UserNotFoundException("User not found")
+        );
+
+//        Get winner
+        User winnerUser = userFacade.readUserBySteamUsername(winner).orElseThrow(
+                () -> new UserNotFoundException("User not found")
+        );
+
+//        Check if users are in same lobby
+        if (loserUser.getLobby().getId() == winnerUser.getLobby().getId()) {
+            creditFacade.transferCredits(
+                    loserUser.getKeycloakId(),
+                    winnerUser.getId(),
+                    loserUser.getLobby().getAmount(),
+                    "Transaction after game match"
+            );
+        }
+//
+
+        Lobby lobby = winnerUser.getLobby();
+        lobby.setLobbyWinnerUsername(winnerUser.getLoginName());
+        lobbyFacade.update(lobby);
+
+        CreditTransaction transactionFromLoser = new CreditTransaction(
+                loserUser,
+                -loserUser.getLobby().getAmount(),
+                "Transaction after game match",
+                winnerUser,
+                TransactionType.MATCH_LOSS
+        );
+
+        CreditTransaction transactionFromWinner = new CreditTransaction(
+                winnerUser,
+                winnerUser.getLobby().getAmount(),
+                "Transaction after game match",
+                loserUser,
+                TransactionType.MATCH_WIN
+        );
+
+        creditFacade.create(transactionFromLoser);
+        creditFacade.create(transactionFromWinner);
+
+        return null;
+    }
+
+
+//    Endpoint to send winner to the frontend
+    @Override
+    public ResponseEntity<WinnerResponseDto> getWinnerOfCs2Duel(Integer lobbyId) {
+        Lobby lobby = lobbyFacade.readOne(lobbyId).orElseThrow(
+                () -> new LobbyNotFoundException("Lobby with ID " + lobbyId + " not found.")
+        );
+
+        WinnerResponseDto winnerResponseDto = new WinnerResponseDto();
+        winnerResponseDto.setWinnerUsername(lobby.getLobbyWinnerUsername());
+
+        return ResponseEntity.ok(winnerResponseDto);
     }
 }

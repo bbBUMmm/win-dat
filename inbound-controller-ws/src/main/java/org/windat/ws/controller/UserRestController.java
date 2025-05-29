@@ -91,6 +91,7 @@ public class UserRestController implements UsersApi {
             user.setLoginName(userCreateRequestDto.getUsername());
             user.setUserRoleEnum(UserRole.USER_ROLE);
             user.setLobby(null);
+            user.setCs2Username(userCreateRequestDto.getCs2Username());
 
             User persistedUser = userFacade.create(user);
 

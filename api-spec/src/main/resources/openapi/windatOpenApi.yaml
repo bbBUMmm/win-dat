@@ -12,6 +12,7 @@ components:
         - id
         - name
         - created
+        - amount
       properties:
         id:
           type: integer
@@ -20,6 +21,10 @@ components:
         name:
           type: string
           description: Name of the lobby
+        amount:
+          type: integer
+          format: int32
+          description: Amount at which the game is played
         created:
           type: string
           format: date-time
@@ -70,6 +75,9 @@ components:
           type: integer
           format: int32
           description: Total number of games lost by the user.
+        cs2Username:
+          type: string
+          description: Username in the game CounterStrike 2
     UserRole:
       type: string
       enum:
@@ -80,6 +88,9 @@ components:
       properties:
         name:
           type: string
+        amount:
+          type: integer
+          format: int32
     UserCreateRequest:
       type: object
       required:
@@ -88,6 +99,7 @@ components:
         - lastName
         - email
         - password
+        - cs2Username
       properties:
 #        That will be username on the page
         username:
@@ -113,6 +125,8 @@ components:
           description: User's chosen password
           minLength: 8
           example: StrongPassword123!
+        cs2Username:
+          type: string
     CreditTransferRequest:
       type: object
       required:
@@ -132,6 +146,17 @@ components:
           type: string
           description: Optional description for the transfer.
           nullable: true
+    DuelResultPayload:
+      type: object
+      properties:
+        winner:
+          type: string
+          description: Winners cs2 match name
+        loser:
+          type: string
+          description: Loser cs2 match name
+
+
 #          This dto will be returned from the /transaction endpoint
     CreditTransaction:
       type: object
@@ -199,6 +224,12 @@ components:
           nullable: true
         type:
           $ref: '#/components/schemas/TransactionType'
+    WinnerResponse:
+      type: object
+      properties:
+        winnerUsername:
+          type: string
+          description: The ID of the primary user for this transaction.
 
 
 paths:
@@ -461,3 +492,43 @@ paths:
           description: Unauthorized.
         '403':
           description: Forbidden (if admin-only).
+  /duel-results:
+    post:
+      summary: Get result of cs2 duel
+      operationId: getResultOfCs2Duel
+      tags:
+        - Lobbies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DuelResultPayload'
+      responses:
+        '200':
+          description: Successfully retrieve winner
+        '500':
+          description: Server error
+  /duel-winner/{lobbyId}:
+    get:
+      summary: Get winner of cs2 duel
+      operationId: getWinnerOfCs2Duel
+      parameters:
+        - name: lobbyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the lobby from which you need to get winner
+      tags:
+        - Lobbies
+      responses:
+        '200':
+          description: Transaction recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WinnerResponse'
+        '500':
+          description: Server error

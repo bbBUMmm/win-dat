@@ -30,6 +30,12 @@
                 <column name="closed" nullable="false"/>
             </basic>
 
+            <basic name="amount">
+                <column name="amount" nullable="false" column-definition="INTEGER DEFAULT 1000"/>
+            </basic>
+
+            <basic name="lobbyWinnerUsername" />
+
             <one-to-many name="userList" target-entity="org.windat.domain.entity.User">
                 <join-table name="LOBBY_USERS">
                     <join-column name="LOBBY_ID" referenced-column-name="ID"/>
@@ -68,6 +74,8 @@
             <basic name="gamesLost">
                 <column name="games_lost" nullable="false" column-definition="INTEGER DEFAULT 0"/>
             </basic>
+
+            <basic name="cs2Username" />
             <many-to-one name="lobby" target-entity="org.windat.domain.entity.Lobby">
                 <join-column name="lobby_id"/>
             </many-to-one>
