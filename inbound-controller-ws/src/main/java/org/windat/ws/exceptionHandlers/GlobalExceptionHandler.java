@@ -77,6 +77,30 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UserDoesNotHaveEnoughBalanceException.class)
+    @ResponseStatus(HttpStatus.PRECONDITION_FAILED) // 412
+    public ResponseEntity<Object> userDoesNotHaveEnoughCredits(UserDoesNotHaveEnoughBalanceException exception) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.PRECONDITION_FAILED.value());
+        body.put("error", HttpStatus.PRECONDITION_FAILED.getReasonPhrase());
+        body.put("message", exception.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @ExceptionHandler(UserAlreadyHasLobbyWithNameException.class)
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
+    public ResponseEntity<Object> handleUserAlreadyHasLobbyWithNameException(UserAlreadyHasLobbyWithNameException exception) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", HttpStatus.CONFLICT.getReasonPhrase());
+        body.put("message", exception.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
     // General error handler
 //    @ExceptionHandler(Exception.class)
 //    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -317,6 +317,8 @@ paths:
           description: Lobby not found
         '409':
           description: User is already in the lobby
+        '412':
+          description: Not enough credits
   /lobbies/me:
     delete:
       summary: Remove authenticated user from their current lobby
@@ -394,6 +396,23 @@ paths:
           description: Invalid request payload (missing required fields, invalid email format)
         '409':
           description: User with provided username or email already exists
+        '500':
+          description: Internal server error
+  /users/me:
+    get:
+      summary: Get authenticated application user
+      operationId: getOneAuthenticatedApplicationUser
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
         '500':
           description: Internal server error
   /users/leaderboard:

@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.windat.domain.enums.UserRole;
 import org.windat.domain.entity.User;
+import org.windat.domain.exceptions.UserNotFoundException;
 import org.windat.domain.service.CreditFacade;
 import org.windat.domain.service.UserFacade;
 import org.windat.rest.api.UsersApi;
@@ -122,6 +123,19 @@ public class UserRestController implements UsersApi {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(userDtos);
+    }
+
+    @Override
+    public ResponseEntity<UserDto> getOneAuthenticatedApplicationUser() {
+        //        Get user from jwt token
+        UserDto userDto = (UserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UUID keycloakId = userDto.getKeycloakId();
+
+        User user = userFacade.readOne(keycloakId).orElseThrow(
+                () -> new UserNotFoundException("User with keycloakId " + keycloakId + " not found")
+        );
+
+        return ResponseEntity.ok(userMapper.toDto(user));
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.windat.ws.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 import org.windat.domain.entity.CreditTransaction;
 import org.windat.domain.enums.TransactionType;
@@ -83,6 +82,11 @@ public class LobbyRestController implements LobbiesApi, DuelResultsApi, DuelWinn
             return userFacade.create(newUser);
         });
 
+//      Check if user is currently in different lobby
+        if (user.hasAnyLobby()){
+            throw new UserAlreadyHasLobbyWithNameException("You are already in the lobby with name " +
+                    user.getLobby().getName() + ".");
+        }
 //        Check if lobby is full
         if (lobby.isFull()) {
             throw new LobbyFullException("Lobby is already full.");
@@ -91,6 +95,12 @@ public class LobbyRestController implements LobbiesApi, DuelResultsApi, DuelWinn
 //        Check if user already exist in lobby
         if (lobby.containsUser(user)) {
             throw new UserAlreadyInLobbyException("User " + username + " is already in lobby.");
+        }
+
+//        Check if user has enough credits to play in this lobby
+        if (user.getCredits() <= lobby.getAmount()) {
+            throw new UserDoesNotHaveEnoughBalanceException("You do not have enough credits to join this lobby. You need " +
+                    (lobby.getAmount() - user.getCredits()) + " credits more.");
         }
 
         lobby.addUser(user);
