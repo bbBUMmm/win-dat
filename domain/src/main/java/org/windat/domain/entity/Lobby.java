@@ -51,6 +51,13 @@ public class Lobby {
     private Date closed;
 
     /**
+     * Describes amount of credits required from each player to put into game
+     */
+    private Integer amount;
+
+    private String lobbyWinnerUsername;
+
+    /**
      * List of users currently participating in the lobby.
      * Represents the active users within the game session.
      * Note: the list is limited to 2 users in one lobby
@@ -67,6 +74,7 @@ public class Lobby {
             throw new NullPointerException("User cannot be null");
         }
         userList.add(user);
+        user.setLobby(this);
     }
 
     /**
@@ -79,6 +87,7 @@ public class Lobby {
             throw new IllegalArgumentException("User cannot be null");
         }
         userList.remove(user);
+        user.setLobby(null);
     }
 
     /**
@@ -88,7 +97,16 @@ public class Lobby {
      * Note: The logic `userList.size() > 2` indicates that the lobby can hold a maximum of 2 users.
      */
     public boolean isFull(){
-        return this.userList.size() > 2;
+        return this.userList.size() >= 2;
+    }
+
+    /**
+     * Checks if lobby already has specific user
+     *
+     * @return boolean
+     */
+    public boolean containsUser(User user){
+        return userList.contains(user);
     }
 
     /*
@@ -103,6 +121,10 @@ public class Lobby {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<User> getUserList() {
         return userList;
     }
@@ -111,11 +133,40 @@ public class Lobby {
         return created;
     }
 
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    public void setClosed(Date closed) {
+        this.closed = closed;
+    }
+
     public Date getUpdated() {
         return updated;
     }
 
     public Date getClosed() {
         return closed;
+    }
+
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    public String getLobbyWinnerUsername() {
+        return lobbyWinnerUsername;
+    }
+
+    public void setLobbyWinnerUsername(String lobbyWinnerUsername) {
+        this.lobbyWinnerUsername = lobbyWinnerUsername;
     }
 }

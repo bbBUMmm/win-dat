@@ -3,8 +3,8 @@ spring:
 #    oauth2:
 #      resourceserver:
 #        jwt:
-#          issuer-uri: http://localhost:8082/realms/FSA
-#          jwk-set-uri: http://localhost:8082/realms/FSA/protocol/openid-connect/certs
+#          issuer-uri: http://localhost:8082/realms/WinDat
+#          jwk-set-uri: http://localhost:8082/realms/WinDat/protocol/openid-connect/certs
 #  datasource:
 #    url: jdbc:postgresql://localhost:6969/windat_db
 #    username: admin
@@ -31,3 +31,27 @@ management:
     web:
       exposure:
         include: "*"
+
+keycloak:
+#  Change this url in production
+  auth-server-url: http://localhost:8082
+  realm: WinDat
+  admin-cli:
+    client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+
+rewards:
+  leaderboard:
+    top-players-count: 10
+    prizes:
+#      50000 credits for 1st
+      1st-place: 50000
+      2nd-place: 30000
+      3rd-place: 20000
+      4th-place: 10000
+      5th-place: 7500
+      6th-place: 5000
+      7th-place: 2500
+      8th-place: 1000
+      9th-place: 500
+      10th-place: 250

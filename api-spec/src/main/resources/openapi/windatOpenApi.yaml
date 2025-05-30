@@ -12,6 +12,7 @@ components:
         - id
         - name
         - created
+        - amount
       properties:
         id:
           type: integer
@@ -20,6 +21,10 @@ components:
         name:
           type: string
           description: Name of the lobby
+        amount:
+          type: integer
+          format: int32
+          description: Amount at which the game is played
         created:
           type: string
           format: date-time
@@ -42,12 +47,37 @@ components:
         id:
           type: integer
           format: int32
+        keycloakId:
+          type: string
+          format: uuid
+          description: Unique keycloak identifier
         loginName:
           type: string
         userRoleEnum:
           $ref: '#/components/schemas/UserRole'
-        lobby:
-          $ref: '#/components/schemas/Lobby'
+        lobbyId:
+          type: integer
+          format: int32
+          description: ID of the lobby the user is currently associated with.
+        credits:
+          type: integer
+          format: int32
+          description: Current credit balance of the user.
+        gamesPlayed:
+          type: integer
+          format: int32
+          description: Total number of games played by the user.
+        gamesWon:
+          type: integer
+          format: int32
+          description: Total number of games won by the user.
+        gamesLost:
+          type: integer
+          format: int32
+          description: Total number of games lost by the user.
+        cs2Username:
+          type: string
+          description: Username in the game CounterStrike 2
     UserRole:
       type: string
       enum:
@@ -58,6 +88,149 @@ components:
       properties:
         name:
           type: string
+        amount:
+          type: integer
+          format: int32
+    UserCreateRequest:
+      type: object
+      required:
+        - username
+        - firstName
+        - lastName
+        - email
+        - password
+        - cs2Username
+      properties:
+#        That will be username on the page
+        username:
+          type: string
+          description: User's chosen username
+          example: ThatWillBeUsername
+        firstName:
+          type: string
+          description: User's first name
+          example: Test
+        lastName:
+          type: string
+          description: User's last name
+          example: Admin
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: ThatWillBeUsername@gmail.com
+        password:
+          type: string
+          format: password
+          description: User's chosen password
+          minLength: 8
+          example: StrongPassword123!
+        cs2Username:
+          type: string
+    CreditTransferRequest:
+      type: object
+      required:
+        - receiverId
+        - amount
+      properties:
+        receiverId:
+          type: integer
+          format: int32
+          description: The ID of the user who will receive the credits.
+        amount:
+          type: integer
+          format: int32
+          minimum: 1
+          description: The amount of credits to transfer.
+        description:
+          type: string
+          description: Optional description for the transfer.
+          nullable: true
+    DuelResultPayload:
+      type: object
+      properties:
+        winner:
+          type: string
+          description: Winners cs2 match name
+        loser:
+          type: string
+          description: Loser cs2 match name
+
+
+#          This dto will be returned from the /transaction endpoint
+    CreditTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Unique identifier for the transaction.
+        userId:
+          type: integer
+          format: int32
+          description: Id of user who initiated transaction
+        amount:
+          type: integer
+          format: int32
+          description: Amount of credits transacted (positive for gain, negative for loss).
+        transactionTime:
+          type: string
+          format: date-time
+          description: Timestamp of the transaction.
+        description:
+          type: string
+          description: Description of the transaction (e.g., "Win from match").
+        relatedUserId:
+          type: integer
+          format: int32
+          nullable: true
+        type:
+          $ref: '#/components/schemas/TransactionType'
+#          Enum for the transaction types
+    TransactionType:
+      type: string
+      enum:
+        - MATCH_WIN
+        - MATCH_LOSS
+        - INITIAL_BONUS
+        - ADMIN_ADJUSTMENT
+        - MONTHLY_BONUS
+        - USER_TRANSFER_IN
+        - USER_TRANSFER_OUT
+#         Dto to create a transaction for post /transactions endpoint
+    CreditTransactionRequest:
+      type: object
+      required:
+        - userId
+        - amount
+        - type
+      properties:
+        userId:
+          type: integer
+          format: int32
+          description: The ID of the primary user for this transaction.
+        amount:
+          type: integer
+          format: int32
+          description: The amount of credits for this transaction (positive or negative).
+        description:
+          type: string
+          description: Optional description of the transaction.
+          nullable: true
+        relatedUserId:
+          type: integer
+          format: int32
+          description: The ID of the related user, if applicable.
+          nullable: true
+        type:
+          $ref: '#/components/schemas/TransactionType'
+    WinnerResponse:
+      type: object
+      properties:
+        winnerUsername:
+          type: string
+          description: The ID of the primary user for this transaction.
+
 
 paths:
   /lobbies:
@@ -117,3 +290,264 @@ paths:
                 $ref: '#/components/schemas/Lobby'
         '404':
           description: Lobby not found
+  /lobbies/{lobbyId}/users:
+    post:
+      summary: Add user to lobby
+      operationId: addUserToLobby
+      tags:
+        - Lobbies
+      parameters:
+        - name: lobbyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the lobby to add the user to
+      responses:
+        '200':
+          description: User was successfully added to lobby
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '401':
+          description: Unauthorized — user not authenticated
+        '404':
+          description: Lobby not found
+        '409':
+          description: User is already in the lobby
+        '412':
+          description: Not enough credits
+  /lobbies/me:
+    delete:
+      summary: Remove authenticated user from their current lobby
+      operationId: removeAuthenticatedUserFromLobby
+      tags:
+        - Lobbies
+      responses:
+        '200':
+          description: Authenticated user was successfully removed from their lobby. Returns the updated lobby object or an empty object if no lobby.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '401':
+          description: Unauthorized. User not authenticated.
+        '404':
+          description: Authenticated user is not currently in any lobby.
+        '500':
+          description: Internal server error.
+  /lobbies/{lobbyId}/users/{userId}:
+    delete:
+      summary: Remove a specific user from lobby (Admin access required)
+      operationId: removeUserFromLobbyAsAdmin
+      tags:
+        - Lobbies
+        - Admin
+      parameters:
+        - name: lobbyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the lobby from which to remove the user
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the user to remove from the lobby
+      responses:
+        '200':
+          description: User was successfully removed from lobby
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lobby'
+        '401':
+          description: Unauthorized — user not authenticated
+        '403':
+          description: Forbidden — authenticated user does not have admin privileges
+        '404':
+          description: Lobby or User not found in this lobby
+  /users:
+    post:
+      summary: Create user in keycloak and save it to the application database
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request payload (missing required fields, invalid email format)
+        '409':
+          description: User with provided username or email already exists
+        '500':
+          description: Internal server error
+  /users/me:
+    get:
+      summary: Get authenticated application user
+      operationId: getOneAuthenticatedApplicationUser
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+  /users/leaderboard:
+    get:
+      summary: Get the top 10 users for the leaderboard, sorted by wins.
+      operationId: getLeaderboard
+      tags:
+        - Users
+        - Leaderboard
+      responses:
+        '200':
+          description: List of the top 10 users on the leaderboard.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Internal server error.
+  /users/me/transfer:
+    post:
+      summary: Transfer credits from one user to another.
+      operationId: transferCredits
+      tags:
+        - Users
+        - Credits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditTransferRequest'
+      responses:
+        '200':
+          description: Credits successfully transferred. Returns the updated sender's user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request (e.g., negative amount, senderId equals receiverId).
+        '401':
+          description: Unauthorized - user not authenticated.
+        '403':
+          description: Forbidden - authenticated user is not the sender or does not have sufficient privileges.
+        '404':
+          description: Sender or Receiver user not found.
+        '409':
+          description: Insufficient credits for the transfer.
+  /transactions:
+    get:
+      summary: Get user's credit transaction history.
+      operationId: getCreditTransactions
+      tags:
+        - Credits
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: integer
+            format: int32
+          description: Optional user ID to filter transactions. If not provided, returns transactions for authenticated user.
+      responses:
+        '200':
+          description: List of credit transactions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreditTransaction'
+    post:
+      summary: Record a credit transaction (e.g., admin adjustment, match win/loss).
+      description: This endpoint is primarily for system-initiated transactions (like match outcomes or admin adjustments). Direct user-to-user transfers should use /users/{senderId}/transfer.
+      operationId: createCreditTransaction
+      tags:
+        - Credits
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditTransactionRequest'
+      responses:
+        '201':
+          description: Transaction recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditTransaction'
+        '400':
+          description: Invalid request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden (if admin-only).
+  /duel-results:
+    post:
+      summary: Get result of cs2 duel
+      operationId: getResultOfCs2Duel
+      tags:
+        - Lobbies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DuelResultPayload'
+      responses:
+        '200':
+          description: Successfully retrieve winner
+        '500':
+          description: Server error
+  /duel-winner/{lobbyId}:
+    get:
+      summary: Get winner of cs2 duel
+      operationId: getWinnerOfCs2Duel
+      parameters:
+        - name: lobbyId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            description: ID of the lobby from which you need to get winner
+      tags:
+        - Lobbies
+      responses:
+        '200':
+          description: Transaction recorded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WinnerResponse'
+        '500':
+          description: Server error

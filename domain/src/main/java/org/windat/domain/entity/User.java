@@ -1,6 +1,9 @@
 package org.windat.domain.entity;
 
-import org.windat.domain.UserRole;
+import org.windat.domain.enums.UserRole;
+import org.windat.domain.exceptions.InsufficientCreditsException;
+
+import java.util.UUID;
 
 /**
  * Represents a user within the application.
@@ -14,6 +17,12 @@ public class User {
      * Used as the primary key in the database.
      */
     private int id;
+
+    /**
+     * Unique keycloak identifier
+     * Used to find specific user in keycloak database
+     */
+    private UUID keycloakId;
 
     /**
      * The login name of the user, used for authentication and identification.
@@ -34,11 +43,28 @@ public class User {
     private Lobby lobby;
 
     /**
+     * Represents user balance in the WinDat platform
+     */
+    private Integer credits;
+
+    private Integer gamesPlayed;
+
+    private Integer gamesWon;
+
+    private Integer gamesLost;
+
+    private String cs2Username;
+    /**
      * Default constructor for Hibernate to map entities.
+     * Initializes a new User instance, setting the initial credit balance to 10,000.
      * Required for JPA entity instantiation.
      */
     public User() {
 
+        this.credits = 10000;
+        this.gamesPlayed = 0;
+        this.gamesWon = 0;
+        this.gamesLost = 0;
     }
 
     /**
@@ -75,5 +101,128 @@ public class User {
      */
     public Lobby getLobby() {
         return lobby;
+    }
+
+    /**
+     * Gets id of the lobby user is currently in
+     * @return lobby id
+     */
+    public Integer getCurrentLobbyId(){
+        return (this.lobby != null) ? this.lobby.getId() : null;
+    }
+
+
+    /**
+     *
+     */
+    public UUID getKeycloakId() {
+        return keycloakId;
+    }
+
+    public void setKeycloakId(UUID keycloakId) {
+        this.keycloakId = keycloakId;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
+
+    public void setUserRoleEnum(UserRole userRoleEnum) {
+        this.userRoleEnum = userRoleEnum;
+    }
+
+    public void setLobby(Lobby lobby) {
+        this.lobby = lobby;
+    }
+
+    public boolean hasAnyLobby(){
+        return this.lobby != null;
+    }
+
+    /**
+     * Retrieves the current credit balance of the user.
+     *
+     * @return The total number of credits the user possesses.
+     */
+    public Integer getCredits() {
+        return credits;
+    }
+
+    /**
+     * Sets the credit balance for the user.
+     * This method should be used cautiously, typically for initial setup or administrative adjustments.
+     * For adding/deducting credits, use {@link #addCredits(Integer)} and {@link #deductCredits(Integer)}.
+     *
+     * @param credits The new credit balance to set. Must not be null and must be non-negative.
+     * @throws IllegalArgumentException if the provided credits value is null or negative.
+     */
+    public void setCredits(Integer credits) {
+        if (credits == null || credits < 0) {
+            throw new IllegalArgumentException("Credits cannot be null or negative.");
+        }
+        this.credits = credits;
+    }
+
+    /**
+     * Adds a specified amount of credits to the user's current balance.
+     *
+     * @param amount The amount of credits to add. Must be a positive integer.
+     * @throws IllegalArgumentException if the provided amount is negative.
+     */
+    public void addCredits(Integer amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount to add must be positive.");
+        }
+        this.credits += amount;
+    }
+
+
+    /**
+     * Deducts a specified amount of credits from the user's current balance.
+     *
+     * @param amount The amount of credits to deduct. Must be a positive integer.
+     * @throws IllegalArgumentException     if the provided amount is negative or null.
+     * @throws InsufficientCreditsException if the user's current credit balance is less than the amount to deduct.
+     */
+    public void deductCredits(Integer amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount to deduct must be positive.");
+        }
+        if (this.credits < amount) {
+            throw new InsufficientCreditsException("User has insufficient credits.");
+        }
+        this.credits -= amount;
+    }
+
+    public Integer getGamesPlayed() {
+        return gamesPlayed;
+    }
+
+    public void setGamesPlayed(Integer gamesPlayed) {
+        this.gamesPlayed = gamesPlayed;
+    }
+
+    public Integer getGamesWon() {
+        return gamesWon;
+    }
+
+    public void setGamesWon(Integer gamesWon) {
+        this.gamesWon = gamesWon;
+    }
+
+    public Integer getGamesLost() {
+        return gamesLost;
+    }
+
+    public void setGamesLost(Integer gamesLost) {
+        this.gamesLost = gamesLost;
+    }
+
+    public String getCs2Username() {
+        return cs2Username;
+    }
+
+    public void setCs2Username(String cs2Username) {
+        this.cs2Username = cs2Username;
     }
 }

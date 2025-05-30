@@ -34,6 +34,16 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: db_password
+            - name: KEYCLOAK_ADMIN_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-app-admin
+                  key: client-id
+            - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-app-admin
+                  key: client-secret
             - name: ISSUER_URI
               value: http://4.245.186.27/auth/realms/WinDat
             - name: JWT_URI

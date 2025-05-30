@@ -44,3 +44,4 @@ terraform/container-registry/.terraform/
 terraform/kubernetes/.terraform
 terraform/public-ip/.terraform
 terraform/psql/.terraform
+/.env.dev

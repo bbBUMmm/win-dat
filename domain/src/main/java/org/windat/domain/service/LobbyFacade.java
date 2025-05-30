@@ -3,6 +3,7 @@ package org.windat.domain.service;
 import org.windat.domain.entity.Lobby;
 
 import java.util.Collection;
+import java.util.Optional;
 
 
 // Note for myself:
@@ -10,4 +11,10 @@ import java.util.Collection;
 public interface LobbyFacade {
 
     Collection<Lobby> readAll();
+
+    Lobby create(Lobby lobby);
+
+    Optional<Lobby> readOne(Integer lobbyId);
+
+    Lobby update(Lobby lobby);
 }
