@@ -1,6 +1,6 @@
 [ {
   "id" : "83130e73-2e9d-416a-b998-6ff8db0e7935",
-  "realm" : "WinDat",
+  "realm" : "FSA",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
