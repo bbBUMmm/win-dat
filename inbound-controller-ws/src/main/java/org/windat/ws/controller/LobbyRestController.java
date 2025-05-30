@@ -272,6 +272,16 @@ public class LobbyRestController implements LobbiesApi, DuelResultsApi, DuelWinn
         lobby.setLobbyWinnerUsername(winnerUser.getLoginName());
         lobbyFacade.update(lobby);
 
+//        Set wincount
+        loserUser.setGamesPlayed(loserUser.getGamesPlayed()+1);
+        loserUser.setGamesLost(loserUser.getGamesLost()+1);
+
+        winnerUser.setGamesPlayed(winnerUser.getGamesPlayed()+1);
+        winnerUser.setGamesWon(winnerUser.getGamesWon()+1);
+
+        userFacade.update(winnerUser);
+        userFacade.update(loserUser);
+
         CreditTransaction transactionFromLoser = new CreditTransaction(
                 loserUser,
                 -loserUser.getLobby().getAmount(),

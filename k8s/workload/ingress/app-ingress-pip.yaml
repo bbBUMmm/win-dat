@@ -11,27 +11,69 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - http:
-      paths:
-      # FSA toto si vo finale budete musiet pomenit na zaklade Vasej aplikacie
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: fsa-fe
-            port:
-              number: 80
-      - path: /lobbies
-        pathType: Prefix
-        backend:
-          service:
-            name: fsa-be
-            port:
-              number: 8080
-      - path: /auth
-        pathType: Prefix
-        backend:
-          service:
-            name: fsa-keycloak-http
-            port:
-              number: 80
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-fe
+                port:
+                  number: 80
+
+
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-keycloak-http
+                port:
+                  number: 80
+
+
+
+          # API endpoint for /lobbies
+          - path: /lobbies
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-be
+                port:
+                  number: 8080
+
+          # API endpoint for /users
+          - path: /users
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-be
+                port:
+                  number: 8080
+
+          # API endpoint for /transactions
+          - path: /transactions
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-be
+                port:
+                  number: 8080
+
+          # API endpoint for /duel-results
+          - path: /duel-results
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-be
+                port:
+                  number: 8080
+
+
+          - path: /duel-winner
+            pathType: Prefix
+            backend:
+              service:
+                name: fsa-be
+                port:
+                  number: 8080
+
