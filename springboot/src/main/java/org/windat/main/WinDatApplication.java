@@ -16,14 +16,14 @@ public class WinDatApplication
 {
     public static void main(String[] args)
     {
-        Dotenv dotenv = Dotenv.configure()
-//                Root of the project
-                .directory(System.getProperty("user.dir"))
-//                Name of the env file
-                .filename(".env.dev")
-                .load();
-
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
+//        Dotenv dotenv = Dotenv.configure()
+////                Root of the project
+//                .directory(System.getProperty("user.dir"))
+////                Name of the env file
+//                .filename(".env.dev")
+//                .load();
+//
+//        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
         SpringApplication.run(WinDatApplication.class, args);
     }
 }
